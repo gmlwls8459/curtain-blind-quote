@@ -1,4 +1,5 @@
-import type { Category, Fullness, Opacity, QuoteInput, Unit, VatMode } from '../pricing/types';
+import { useEffect, useState } from 'react'
+import type { Category, Fullness, Opacity, QuoteInput, Unit, VatMode } from '../pricing/types'
 import {
   CATEGORY_LABELS,
   CURTAIN_CATEGORIES,
@@ -6,29 +7,63 @@ import {
   INSTALL_LABELS,
   MOTOR_CATEGORIES,
   OPACITY_LABELS,
-} from '../pricing/types';
+} from '../pricing/types'
 
 interface Props {
-  value: QuoteInput;
-  onChange: (next: QuoteInput) => void;
+  value: QuoteInput
+  onChange: (next: QuoteInput) => void
 }
 
-const CATEGORIES = Object.keys(CATEGORY_LABELS) as Category[];
+const CATEGORIES = Object.keys(CATEGORY_LABELS) as Category[]
+
+function parseNonNegInt(raw: string): number {
+  if (raw.trim() === '') return 0
+  const n = Math.floor(Number(raw))
+  return Number.isFinite(n) && n >= 0 ? n : 0
+}
+
+function parseNonNegNumber(raw: string): number {
+  if (raw.trim() === '') return 0
+  const n = Number(raw)
+  return Number.isFinite(n) && n >= 0 ? n : 0
+}
 
 export function QuoteForm({ value, onChange }: Props) {
-  const set = <K extends keyof QuoteInput>(key: K, v: QuoteInput[K]) => {
-    const next = { ...value, [key]: v };
-    // Reset motor when switching away from motor categories
-    if (key === 'category') {
-      const cat = v as Category;
-      if (!MOTOR_CATEGORIES.includes(cat)) next.motorized = false;
-      if (!CURTAIN_CATEGORIES.includes(cat)) next.fullness = 2;
-    }
-    onChange(next);
-  };
+  const [widthText, setWidthText] = useState(() =>
+    value.width === 0 ? '' : String(value.width),
+  )
+  const [heightText, setHeightText] = useState(() =>
+    value.height === 0 ? '' : String(value.height),
+  )
+  const [quantityText, setQuantityText] = useState(() =>
+    value.quantity === 0 ? '' : String(value.quantity),
+  )
 
-  const showFullness = CURTAIN_CATEGORIES.includes(value.category);
-  const showMotor = MOTOR_CATEGORIES.includes(value.category);
+  // Sync draft text when parent replaces input (edit / reset / unit convert)
+  useEffect(() => {
+    setWidthText(value.width === 0 ? '' : String(value.width))
+  }, [value.width])
+
+  useEffect(() => {
+    setHeightText(value.height === 0 ? '' : String(value.height))
+  }, [value.height])
+
+  useEffect(() => {
+    setQuantityText(value.quantity === 0 ? '' : String(value.quantity))
+  }, [value.quantity])
+
+  const set = <K extends keyof QuoteInput>(key: K, v: QuoteInput[K]) => {
+    const next = { ...value, [key]: v }
+    if (key === 'category') {
+      const cat = v as Category
+      if (!MOTOR_CATEGORIES.includes(cat)) next.motorized = false
+      if (!CURTAIN_CATEGORIES.includes(cat)) next.fullness = 2
+    }
+    onChange(next)
+  }
+
+  const showFullness = CURTAIN_CATEGORIES.includes(value.category)
+  const showMotor = MOTOR_CATEGORIES.includes(value.category)
 
   return (
     <section className="card form-card">
@@ -58,12 +93,15 @@ export function QuoteForm({ value, onChange }: Props) {
         <label className="field">
           <span>가로 (폭)</span>
           <input
-            type="number"
-            min={1}
-            step={1}
-            value={value.width || ''}
-            onChange={(e) => set('width', Number(e.target.value) || 0)}
+            type="text"
             inputMode="decimal"
+            value={widthText}
+            onChange={(e) => {
+              const raw = e.target.value
+              if (raw !== '' && !/^\d*\.?\d*$/.test(raw)) return
+              setWidthText(raw)
+              set('width', parseNonNegNumber(raw))
+            }}
           />
         </label>
         <span className="times" aria-hidden>
@@ -72,12 +110,15 @@ export function QuoteForm({ value, onChange }: Props) {
         <label className="field">
           <span>세로 (높이)</span>
           <input
-            type="number"
-            min={1}
-            step={1}
-            value={value.height || ''}
-            onChange={(e) => set('height', Number(e.target.value) || 0)}
+            type="text"
             inputMode="decimal"
+            value={heightText}
+            onChange={(e) => {
+              const raw = e.target.value
+              if (raw !== '' && !/^\d*\.?\d*$/.test(raw)) return
+              setHeightText(raw)
+              set('height', parseNonNegNumber(raw))
+            }}
           />
         </label>
         <div className="unit-toggle" role="group" aria-label="단위">
@@ -87,17 +128,16 @@ export function QuoteForm({ value, onChange }: Props) {
               type="button"
               className={`unit-btn ${value.unit === u ? 'selected' : ''}`}
               onClick={() => {
-                if (u === value.unit) return;
-                // Convert values when toggling
-                const next = { ...value, unit: u };
+                if (u === value.unit) return
+                const next = { ...value, unit: u }
                 if (u === 'mm') {
-                  next.width = Math.round(value.width * 10);
-                  next.height = Math.round(value.height * 10);
+                  next.width = Math.round(value.width * 10)
+                  next.height = Math.round(value.height * 10)
                 } else {
-                  next.width = Math.round(value.width / 10);
-                  next.height = Math.round(value.height / 10);
+                  next.width = Math.round(value.width / 10)
+                  next.height = Math.round(value.height / 10)
                 }
-                onChange(next);
+                onChange(next)
               }}
             >
               {u}
@@ -109,20 +149,15 @@ export function QuoteForm({ value, onChange }: Props) {
       <label className="field">
         <span>수량</span>
         <input
-          type="number"
-          min={0}
-          step={1}
-          value={value.quantity === 0 ? 0 : value.quantity || ''}
+          type="text"
+          inputMode="numeric"
+          value={quantityText}
           onChange={(e) => {
             const raw = e.target.value
-            if (raw === '') {
-              set('quantity', 0)
-              return
-            }
-            const n = Math.floor(Number(raw))
-            set('quantity', Number.isFinite(n) && n >= 0 ? n : 0)
+            if (raw !== '' && !/^\d*$/.test(raw)) return
+            setQuantityText(raw)
+            set('quantity', parseNonNegInt(raw))
           }}
-          inputMode="numeric"
         />
       </label>
 
@@ -229,5 +264,5 @@ export function QuoteForm({ value, onChange }: Props) {
         />
       </label>
     </section>
-  );
+  )
 }
