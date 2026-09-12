@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { PricingSettings } from '../types';
-import { loadSettings, resetSettings, saveSettings } from '../lib/storage';
+import type { PricingSettings } from '../pricing/types';
+import { loadSettings, resetSettings, saveSettings } from './storage';
 
 export function useSettings() {
   const [settings, setSettings] = useState<PricingSettings>(() => loadSettings());

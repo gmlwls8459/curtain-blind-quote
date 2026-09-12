@@ -1,4 +1,4 @@
-import type { Category, Fullness, Opacity, QuoteInput, Unit, VatMode } from '../types';
+import type { Category, Fullness, Opacity, QuoteInput, Unit, VatMode } from '../pricing/types';
 import {
   CATEGORY_LABELS,
   CURTAIN_CATEGORIES,
@@ -6,7 +6,7 @@ import {
   INSTALL_LABELS,
   MOTOR_CATEGORIES,
   OPACITY_LABELS,
-} from '../types';
+} from '../pricing/types';
 
 interface Props {
   value: QuoteInput;

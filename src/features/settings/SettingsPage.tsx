@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import type { Category, Opacity, PricingSettings } from '../types';
-import { CATEGORY_LABELS, OPACITY_LABELS } from '../types';
-import { DEFAULT_SETTINGS } from '../lib/defaults';
-import { formatKRW } from '../lib/pricing';
+import type { Category, Opacity, PricingSettings } from '../pricing/types';
+import { CATEGORY_LABELS, OPACITY_LABELS } from '../pricing/types';
+import { DEFAULT_SETTINGS } from '../pricing/defaults';
+import { formatKRW } from '../pricing/pricing';
 
 interface Props {
   settings: PricingSettings;

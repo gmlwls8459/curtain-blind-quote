@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { HashRouter, Navigate, Route, Routes, useNavigate } from 'react-router-dom';
-import { Layout } from './components/Layout';
-import { useQuotes } from './hooks/useQuotes';
-import { useSettings } from './hooks/useSettings';
-import { HomePage } from './pages/HomePage';
-import { QuotesPage } from './pages/QuotesPage';
-import { SettingsPage } from './pages/SettingsPage';
-import type { SavedQuote } from './types';
+import { Layout } from '../shared/Layout';
+import { useQuotes } from '../features/saved-quotes/useQuotes';
+import { useSettings } from '../features/settings/useSettings';
+import { HomePage } from '../features/quote/HomePage';
+import { QuotesPage } from '../features/saved-quotes/QuotesPage';
+import { SettingsPage } from '../features/settings/SettingsPage';
+import type { SavedQuote } from '../features/pricing/types';
 
 function AppRoutes() {
   const { settings, setSettings, reset } = useSettings();

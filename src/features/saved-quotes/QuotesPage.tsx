@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
-import type { SavedQuote } from '../types';
-import { CATEGORY_LABELS } from '../types';
-import { formatKRW, formatNumber } from '../lib/pricing';
+import type { SavedQuote } from '../pricing/types';
+import { CATEGORY_LABELS } from '../pricing/types';
+import { formatKRW, formatNumber } from '../pricing/pricing';
 
 interface Props {
   quotes: SavedQuote[];

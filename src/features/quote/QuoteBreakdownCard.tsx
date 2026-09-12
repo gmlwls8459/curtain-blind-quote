@@ -1,11 +1,11 @@
-import type { QuoteBreakdown, QuoteInput, PricingSettings } from '../types';
+import type { QuoteBreakdown, QuoteInput, PricingSettings } from '../pricing/types';
 import {
   CATEGORY_LABELS,
   FULLNESS_LABELS,
   INSTALL_LABELS,
   OPACITY_LABELS,
-} from '../types';
-import { formatKRW, formatNumber, supportsFullness, supportsMotor } from '../lib/pricing';
+} from '../pricing/types';
+import { formatKRW, formatNumber, supportsFullness, supportsMotor } from '../pricing/pricing';
 
 interface Props {
   input: QuoteInput;

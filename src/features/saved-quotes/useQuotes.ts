@@ -1,12 +1,12 @@
 import { useCallback, useState } from 'react';
-import type { QuoteBreakdown, QuoteInput, SavedQuote } from '../types';
-import { CATEGORY_LABELS } from '../types';
+import type { QuoteBreakdown, QuoteInput, SavedQuote } from '../pricing/types';
+import { CATEGORY_LABELS } from '../pricing/types';
 import {
   createId,
   deleteQuote,
   loadQuotes,
   upsertQuote,
-} from '../lib/storage';
+} from './storage';
 
 export function useQuotes() {
   const [quotes, setQuotes] = useState<SavedQuote[]>(() => loadQuotes());

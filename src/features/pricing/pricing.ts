@@ -3,8 +3,8 @@ import type {
   QuoteBreakdown,
   QuoteInput,
   PricingSettings,
-} from '../types';
-import { CURTAIN_CATEGORIES, MOTOR_CATEGORIES } from '../types';
+} from './types';
+import { CURTAIN_CATEGORIES, MOTOR_CATEGORIES } from './types';
 
 /** Convert width/height to meters based on unit */
 export function toMeters(value: number, unit: 'cm' | 'mm'): number {

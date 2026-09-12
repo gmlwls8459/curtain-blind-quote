@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { QuoteForm } from '../components/QuoteForm';
-import { QuoteBreakdownCard } from '../components/QuoteBreakdownCard';
-import { DEFAULT_INPUT } from '../lib/defaults';
-import { calculateQuote } from '../lib/pricing';
-import type { PricingSettings, QuoteInput, SavedQuote } from '../types';
+import { QuoteForm } from './QuoteForm';
+import { QuoteBreakdownCard } from './QuoteBreakdownCard';
+import { DEFAULT_INPUT } from '../pricing/defaults';
+import { calculateQuote } from '../pricing/pricing';
+import type { PricingSettings, QuoteInput, SavedQuote } from '../pricing/types';
 
 interface Props {
   settings: PricingSettings;

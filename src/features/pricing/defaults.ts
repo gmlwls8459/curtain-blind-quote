@@ -1,4 +1,4 @@
-import type { PricingSettings, QuoteInput } from '../types';
+import type { PricingSettings, QuoteInput } from './types';
 
 /** 샘플 단가 — 한국 시장 대략적 참고가 (실제 시세와 다를 수 있음) */
 export const DEFAULT_SETTINGS: PricingSettings = {
