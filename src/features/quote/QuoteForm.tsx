@@ -110,10 +110,18 @@ export function QuoteForm({ value, onChange }: Props) {
         <span>수량</span>
         <input
           type="number"
-          min={1}
+          min={0}
           step={1}
-          value={value.quantity || ''}
-          onChange={(e) => set('quantity', Math.max(1, Math.floor(Number(e.target.value) || 1)))}
+          value={value.quantity === 0 ? 0 : value.quantity || ''}
+          onChange={(e) => {
+            const raw = e.target.value
+            if (raw === '') {
+              set('quantity', 0)
+              return
+            }
+            const n = Math.floor(Number(raw))
+            set('quantity', Number.isFinite(n) && n >= 0 ? n : 0)
+          }}
           inputMode="numeric"
         />
       </label>

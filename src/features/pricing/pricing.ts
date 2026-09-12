@@ -45,7 +45,7 @@ export function calculateQuote(
 ): QuoteBreakdown {
   const areaM2 = calcAreaM2(input.width, input.height, input.unit);
   const unitPrice = settings.unitPrices[input.category] ?? 0;
-  const quantity = Math.max(1, Math.floor(input.quantity) || 1);
+  const quantity = Math.max(0, Math.floor(Number(input.quantity)) || 0);
 
   const fullnessMultiplier = supportsFullness(input.category)
     ? input.fullness
