@@ -5,7 +5,7 @@ import { useQuotes } from '../features/saved-quotes/useQuotes';
 import { useSettings } from '../features/settings/useSettings';
 import { HomePage } from '../features/quote/HomePage';
 import { QuotesPage } from '../features/saved-quotes/QuotesPage';
-import { SettingsPage } from '../features/settings/SettingsPage';
+import { AdminPage } from '../features/admin';
 import type { SavedQuote } from '../features/pricing/types';
 
 function AppRoutes() {
@@ -42,9 +42,9 @@ function AppRoutes() {
           }
         />
         <Route
-          path="/settings"
+          path="/admin"
           element={
-            <SettingsPage
+            <AdminPage
               settings={settings}
               onChange={setSettings}
               onReset={reset}

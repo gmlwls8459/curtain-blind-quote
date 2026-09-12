@@ -665,3 +665,41 @@ a {
     -webkit-print-color-adjust: exact;
   }
 }
+
+/* Admin login */
+.admin-login-card {
+  max-width: 420px;
+}
+
+.admin-honesty {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.form-error {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--danger-soft);
+  color: var(--danger);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.admin-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--teal-soft);
+  border: 1px solid #b7d8d3;
+}
+
+.admin-toolbar-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--teal-deep);
+}

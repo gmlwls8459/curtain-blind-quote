@@ -21,9 +21,6 @@ export function Layout() {
             <NavLink to="/quotes" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
               저장목록
             </NavLink>
-            <NavLink to="/settings" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
-              단가설정
-            </NavLink>
           </nav>
         </div>
       </header>
