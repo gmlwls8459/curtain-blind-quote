@@ -39,17 +39,24 @@ export function QuoteForm({ value, onChange }: Props) {
     value.quantity === 0 ? '' : String(value.quantity),
   )
 
-  // Sync draft text when parent replaces input (edit / reset / unit convert)
+  // Sync drafts only when parent value differs from what the draft already means
+  // (keeps empty fields empty while typing; still picks up edit/reset/unit convert)
   useEffect(() => {
-    setWidthText(value.width === 0 ? '' : String(value.width))
+    setWidthText((prev) =>
+      parseNonNegNumber(prev) === value.width ? prev : String(value.width),
+    )
   }, [value.width])
 
   useEffect(() => {
-    setHeightText(value.height === 0 ? '' : String(value.height))
+    setHeightText((prev) =>
+      parseNonNegNumber(prev) === value.height ? prev : String(value.height),
+    )
   }, [value.height])
 
   useEffect(() => {
-    setQuantityText(value.quantity === 0 ? '' : String(value.quantity))
+    setQuantityText((prev) =>
+      parseNonNegInt(prev) === value.quantity ? prev : String(value.quantity),
+    )
   }, [value.quantity])
 
   const set = <K extends keyof QuoteInput>(key: K, v: QuoteInput[K]) => {
