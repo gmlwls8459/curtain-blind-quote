@@ -2,14 +2,14 @@ import type { PricingSettings, QuoteInput } from './types';
 
 /**
  * D'MOTIVE WINDOW 기획 가정 단가
- * — 사업아이디어 PPT 패키지 밴드 + 마진 PPT SUITE 예시(220만) 기준
+ * — PPT 밴드 안 적정가 (ROOM 70 / SUITE 180 / HOME 400만). 라인·품목 배수는 1.0
  */
 export const DEFAULT_SETTINGS: PricingSettings = {
-  label: '기획 가정 단가',
+  label: '적정 가정 단가',
   packageBases: {
-    room: 800_000,
-    suite: 2_200_000,
-    home: 5_000_000,
+    room: 700_000,
+    suite: 1_800_000,
+    home: 4_000_000,
   },
   packageBands: {
     room: { min: 450_000, max: 1_200_000 },
@@ -18,15 +18,15 @@ export const DEFAULT_SETTINGS: PricingSettings = {
   },
   lineMultipliers: {
     livingSoft: 1.0,
-    sleepDark: 1.08,
-    showLuxury: 1.15,
+    sleepDark: 1.0,
+    showLuxury: 1.0,
   },
   categoryMultipliers: {
     curtain: 1.0,
     roll: 1.0,
-    wood: 1.05,
+    wood: 1.0,
     combi: 1.0,
-    blackout: 1.02,
+    blackout: 1.0,
   },
   layeredFeeRoom: 100_000,
   layeredIncludedInSuite: true,
@@ -59,6 +59,6 @@ export const DEFAULT_INPUT: QuoteInput = {
 };
 
 export const STORAGE_KEYS = {
-  settings: 'curtain-blind-quote:settings:v2',
+  settings: 'curtain-blind-quote:settings:v3',
   quotes: 'curtain-blind-quote:quotes:v2',
 } as const;
