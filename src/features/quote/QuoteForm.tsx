@@ -117,12 +117,11 @@ export function QuoteForm({ value, onChange, settings }: Props) {
               type="button"
               role="radio"
               aria-checked={value.lineId === line}
-              className={`chip chip-stack ${value.lineId === line ? 'selected' : ''}`}
+              className={`chip ${value.lineId === line ? 'selected' : ''}`}
               onClick={() => set('lineId', line)}
               title={LINE_HINTS[line]}
             >
-              <strong>{LINE_LABELS[line]}</strong>
-              <small>×{settings.lineMultipliers[line]}</small>
+              {LINE_LABELS[line]}
             </button>
           ))}
         </div>

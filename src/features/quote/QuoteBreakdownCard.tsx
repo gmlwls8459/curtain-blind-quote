@@ -35,16 +35,13 @@ export function QuoteBreakdownCard({ input, breakdown, settings }: Props) {
         <div>
           <dt>라인</dt>
           <dd>
-            {LINE_LABELS[input.lineId]} (×{breakdown.lineMultiplier})
+            {LINE_LABELS[input.lineId]}
           </dd>
         </div>
         <div>
           <dt>품목</dt>
           <dd>
-            {CATEGORY_LABELS[input.category]}
-            {breakdown.categoryMultiplier !== 1
-              ? ` (×${breakdown.categoryMultiplier})`
-              : ''}
+{CATEGORY_LABELS[input.category]}
           </dd>
         </div>
         <div>
@@ -90,14 +87,10 @@ export function QuoteBreakdownCard({ input, breakdown, settings }: Props) {
         </li>
         <li>
           <span>
-            배수 적용 후 (라인 ×{breakdown.lineMultiplier}
-            {breakdown.categoryMultiplier !== 1
-              ? ` · 품목 ×${breakdown.categoryMultiplier}`
-              : ''}
+            조정 후 금액
             {settings.sizeAdjustmentEnabled
-              ? ` · 사이즈 ×${breakdown.sizeFactor}`
+              ? ` (사이즈 반영)`
               : ''}
-            )
           </span>
           <strong>{formatKRW(breakdown.afterMultipliers)}</strong>
         </li>
