@@ -63,7 +63,7 @@ export function HomePage({ settings, onSave, editing, onClearEdit }: Props) {
 
       <div className="quote-grid">
         <div className="no-print">
-          <QuoteForm value={input} onChange={setInput} />
+          <QuoteForm value={input} onChange={setInput} settings={settings} />
         </div>
         <div>
           <QuoteBreakdownCard

@@ -1,11 +1,11 @@
 import type { QuoteBreakdown, QuoteInput, PricingSettings } from '../pricing/types';
 import {
   CATEGORY_LABELS,
-  FULLNESS_LABELS,
   INSTALL_LABELS,
-  OPACITY_LABELS,
+  LINE_LABELS,
+  PACKAGE_LABELS,
 } from '../pricing/types';
-import { formatKRW, formatNumber, supportsFullness, supportsMotor } from '../pricing/pricing';
+import { formatBand, formatKRW, formatNumber } from '../pricing/pricing';
 
 interface Props {
   input: QuoteInput;
@@ -23,54 +23,94 @@ export function QuoteBreakdownCard({ input, breakdown, settings }: Props) {
 
       <dl className="meta-grid">
         <div>
+          <dt>패키지</dt>
+          <dd>
+            {PACKAGE_LABELS[input.packageId]}
+            <span className="band-ref">
+              {' '}
+              (참고 {formatBand(breakdown.bandMin, breakdown.bandMax)})
+            </span>
+          </dd>
+        </div>
+        <div>
+          <dt>라인</dt>
+          <dd>
+            {LINE_LABELS[input.lineId]} (×{breakdown.lineMultiplier})
+          </dd>
+        </div>
+        <div>
           <dt>품목</dt>
-          <dd>{CATEGORY_LABELS[input.category]}</dd>
+          <dd>
+            {CATEGORY_LABELS[input.category]}
+            {breakdown.categoryMultiplier !== 1
+              ? ` (×${breakdown.categoryMultiplier})`
+              : ''}
+          </dd>
         </div>
         <div>
           <dt>규격</dt>
           <dd>
-            {formatNumber(input.width, 1)} × {formatNumber(input.height, 1)} {input.unit}
+            {formatNumber(input.width, 1)} × {formatNumber(input.height, 1)}{' '}
+            {input.unit}
+            {breakdown.areaM2 > 0
+              ? ` · ${formatNumber(breakdown.areaM2, 4)} m²`
+              : ''}
           </dd>
         </div>
         <div>
-          <dt>면적</dt>
-          <dd>{formatNumber(breakdown.areaM2, 4)} m² × {input.quantity}개</dd>
+          <dt>수량</dt>
+          <dd>{input.quantity}식</dd>
         </div>
         <div>
-          <dt>불투명도</dt>
-          <dd>{OPACITY_LABELS[input.opacity]} (×{breakdown.opacityMultiplier})</dd>
+          <dt>레이어드</dt>
+          <dd>
+            {input.layered
+              ? breakdown.layeredIncluded
+                ? '포함 (패키지 기본)'
+                : '가산'
+              : '미적용'}
+          </dd>
         </div>
-        {supportsFullness(input.category) && (
-          <div>
-            <dt>주름배수</dt>
-            <dd>{FULLNESS_LABELS[String(input.fullness)]} (×{breakdown.fullnessMultiplier})</dd>
-          </div>
-        )}
+        <div>
+          <dt>전동·허브</dt>
+          <dd>{input.motorized ? '포함' : '미포함'}</dd>
+        </div>
         <div>
           <dt>설치</dt>
           <dd>{INSTALL_LABELS[input.install]}</dd>
         </div>
-        {supportsMotor(input.category) && (
-          <div>
-            <dt>전동화</dt>
-            <dd>{input.motorized ? '포함' : '미포함'}</dd>
-          </div>
-        )}
       </dl>
 
       <ul className="line-items">
         <li>
           <span>
-            기본 ({formatKRW(breakdown.unitPrice)}/m² × {formatNumber(breakdown.areaM2, 4)} m² × {input.quantity})
+            패키지 기본가 ({PACKAGE_LABELS[input.packageId]})
           </span>
-          <strong>{formatKRW(breakdown.baseAmount)}</strong>
+          <strong>{formatKRW(breakdown.packageBase)}</strong>
         </li>
-        {(breakdown.fullnessMultiplier !== 1 || breakdown.opacityMultiplier !== 1) && (
+        <li>
+          <span>
+            배수 적용 후 (라인 ×{breakdown.lineMultiplier}
+            {breakdown.categoryMultiplier !== 1
+              ? ` · 품목 ×${breakdown.categoryMultiplier}`
+              : ''}
+            {settings.sizeAdjustmentEnabled
+              ? ` · 사이즈 ×${breakdown.sizeFactor}`
+              : ''}
+            )
+          </span>
+          <strong>{formatKRW(breakdown.afterMultipliers)}</strong>
+        </li>
+        {breakdown.layeredFee > 0 && (
           <li>
-            <span>
-              배수 적용 후 (주름 ×{breakdown.fullnessMultiplier} · 불투명도 ×{breakdown.opacityMultiplier})
-            </span>
-            <strong>{formatKRW(breakdown.afterMultipliers)}</strong>
+            <span>레이어드 가산</span>
+            <strong>{formatKRW(breakdown.layeredFee)}</strong>
+          </li>
+        )}
+        {breakdown.motorFee > 0 && (
+          <li>
+            <span>전동 · 스마트허브</span>
+            <strong>{formatKRW(breakdown.motorFee)}</strong>
           </li>
         )}
         {breakdown.installFee > 0 && (
@@ -79,10 +119,16 @@ export function QuoteBreakdownCard({ input, breakdown, settings }: Props) {
             <strong>{formatKRW(breakdown.installFee)}</strong>
           </li>
         )}
-        {breakdown.motorFee > 0 && (
+        <li>
+          <span>창 1식 소계</span>
+          <strong>{formatKRW(breakdown.perWindow)}</strong>
+        </li>
+        {breakdown.quantity > 1 && (
           <li>
-            <span>전동화</span>
-            <strong>{formatKRW(breakdown.motorFee)}</strong>
+            <span>× 수량 {breakdown.quantity}</span>
+            <strong>
+              {formatKRW(breakdown.perWindow * breakdown.quantity)}
+            </strong>
           </li>
         )}
         <li>
@@ -91,16 +137,25 @@ export function QuoteBreakdownCard({ input, breakdown, settings }: Props) {
         </li>
         <li>
           <span>
-            부가세 (10%) {input.vatMode === 'exclusive' ? '· 별도' : '· 포함'}
+            부가세 ({(settings.vatRate * 100).toFixed(0)}%){' '}
+            {input.vatMode === 'exclusive' ? '· 별도' : '· 포함'}
           </span>
           <strong>{formatKRW(breakdown.vat)}</strong>
         </li>
       </ul>
 
       <div className="total-box">
-        <div className="total-label">합계 (100원 단위)</div>
+        <div className="total-label">
+          합계 ({settings.roundTo.toLocaleString('ko-KR')}원 단위)
+        </div>
         <div className="total-value">{formatKRW(breakdown.roundedTotal)}</div>
       </div>
+
+      <p className="band-footnote">
+        패키지 참고 밴드:{' '}
+        {formatBand(breakdown.bandMin, breakdown.bandMax)} · 위 금액은 「
+        {settings.label}」입니다.
+      </p>
 
       {(input.customerName || input.memo) && (
         <div className="extra-notes">

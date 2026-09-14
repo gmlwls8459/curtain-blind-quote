@@ -703,3 +703,75 @@ a {
   font-weight: 700;
   color: var(--teal-deep);
 }
+
+/* Package / line stacked chips */
+.chip.chip-stack {
+  border-radius: 14px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 10px 14px;
+  line-height: 1.25;
+}
+
+.chip.chip-stack strong {
+  font-size: 0.9rem;
+  font-weight: 750;
+}
+
+.chip.chip-stack small {
+  font-size: 0.72rem;
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+.chip.chip-stack.selected small {
+  opacity: 0.92;
+}
+
+.band-ref {
+  font-weight: 500;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.band-footnote {
+  margin: 12px 0 0;
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.band-grid {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 720px) {
+  .band-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.band-edit {
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.band-edit-title {
+  font-weight: 750;
+  margin-bottom: 8px;
+  color: var(--teal-deep);
+}
+
+.check-row-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.check-row-block .check-row {
+  margin-bottom: 8px;
+}

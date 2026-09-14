@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import type { QuoteBreakdown, QuoteInput, SavedQuote } from '../pricing/types';
-import { CATEGORY_LABELS } from '../pricing/types';
+import { PACKAGE_LABELS } from '../pricing/types';
 import {
   createId,
   deleteQuote,
@@ -17,8 +17,8 @@ export function useQuotes() {
       const id = existingId ?? createId();
       const prev = loadQuotes().find((q) => q.id === id);
       const label =
-        (input.customerName.trim() || CATEGORY_LABELS[input.category]) +
-        ` · ${input.width}×${input.height}${input.unit}`;
+        (input.customerName.trim() || PACKAGE_LABELS[input.packageId]) +
+        ` · ${PACKAGE_LABELS[input.packageId]} · ${input.width}×${input.height}${input.unit}`;
       const quote: SavedQuote = {
         id,
         createdAt: prev?.createdAt ?? now,

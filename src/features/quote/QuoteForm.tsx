@@ -1,19 +1,31 @@
 import { useEffect, useState } from 'react'
-import type { Category, Fullness, Opacity, QuoteInput, Unit, VatMode } from '../pricing/types'
+import type {
+  Category,
+  LineId,
+  PackageId,
+  QuoteInput,
+  Unit,
+  VatMode,
+} from '../pricing/types'
 import {
   CATEGORY_LABELS,
-  CURTAIN_CATEGORIES,
-  FULLNESS_LABELS,
   INSTALL_LABELS,
-  MOTOR_CATEGORIES,
-  OPACITY_LABELS,
+  LINE_HINTS,
+  LINE_LABELS,
+  PACKAGE_LABELS,
+  PACKAGE_SUBTITLES,
 } from '../pricing/types'
+import { isLayeredIncluded } from '../pricing/pricing'
+import type { PricingSettings } from '../pricing/types'
 
 interface Props {
   value: QuoteInput
   onChange: (next: QuoteInput) => void
+  settings: PricingSettings
 }
 
+const PACKAGES = Object.keys(PACKAGE_LABELS) as PackageId[]
+const LINES = Object.keys(LINE_LABELS) as LineId[]
 const CATEGORIES = Object.keys(CATEGORY_LABELS) as Category[]
 
 function parseNonNegInt(raw: string): number {
@@ -28,7 +40,7 @@ function parseNonNegNumber(raw: string): number {
   return Number.isFinite(n) && n >= 0 ? n : 0
 }
 
-export function QuoteForm({ value, onChange }: Props) {
+export function QuoteForm({ value, onChange, settings }: Props) {
   const [widthText, setWidthText] = useState(() =>
     value.width === 0 ? '' : String(value.width),
   )
@@ -39,8 +51,6 @@ export function QuoteForm({ value, onChange }: Props) {
     value.quantity === 0 ? '' : String(value.quantity),
   )
 
-  // Sync drafts only when parent value differs from what the draft already means
-  // (keeps empty fields empty while typing; still picks up edit/reset/unit convert)
   useEffect(() => {
     setWidthText((prev) =>
       parseNonNegNumber(prev) === value.width ? prev : String(value.width),
@@ -61,16 +71,17 @@ export function QuoteForm({ value, onChange }: Props) {
 
   const set = <K extends keyof QuoteInput>(key: K, v: QuoteInput[K]) => {
     const next = { ...value, [key]: v }
-    if (key === 'category') {
-      const cat = v as Category
-      if (!MOTOR_CATEGORIES.includes(cat)) next.motorized = false
-      if (!CURTAIN_CATEGORIES.includes(cat)) next.fullness = 2
+    if (key === 'packageId') {
+      const pkg = v as PackageId
+      // SUITE/HOME은 레이어드 기본 ON, ROOM은 유지(선택)
+      if (isLayeredIncluded(pkg, settings)) {
+        next.layered = true
+      }
     }
     onChange(next)
   }
 
-  const showFullness = CURTAIN_CATEGORIES.includes(value.category)
-  const showMotor = MOTOR_CATEGORIES.includes(value.category)
+  const layeredIncluded = isLayeredIncluded(value.packageId, settings)
 
   return (
     <section className="card form-card">
@@ -79,8 +90,47 @@ export function QuoteForm({ value, onChange }: Props) {
       </div>
 
       <fieldset className="field-group">
-        <legend>품목</legend>
-        <div className="chip-row" role="radiogroup" aria-label="품목 카테고리">
+        <legend>패키지</legend>
+        <div className="chip-row" role="radiogroup" aria-label="패키지">
+          {PACKAGES.map((pkg) => (
+            <button
+              key={pkg}
+              type="button"
+              role="radio"
+              aria-checked={value.packageId === pkg}
+              className={`chip chip-stack ${value.packageId === pkg ? 'selected' : ''}`}
+              onClick={() => set('packageId', pkg)}
+            >
+              <strong>{PACKAGE_LABELS[pkg]}</strong>
+              <small>{PACKAGE_SUBTITLES[pkg]}</small>
+            </button>
+          ))}
+        </div>
+      </fieldset>
+
+      <fieldset className="field-group">
+        <legend>라인 (톤)</legend>
+        <div className="chip-row" role="radiogroup" aria-label="라인">
+          {LINES.map((line) => (
+            <button
+              key={line}
+              type="button"
+              role="radio"
+              aria-checked={value.lineId === line}
+              className={`chip chip-stack ${value.lineId === line ? 'selected' : ''}`}
+              onClick={() => set('lineId', line)}
+              title={LINE_HINTS[line]}
+            >
+              <strong>{LINE_LABELS[line]}</strong>
+              <small>×{settings.lineMultipliers[line]}</small>
+            </button>
+          ))}
+        </div>
+      </fieldset>
+
+      <fieldset className="field-group">
+        <legend>품목 유형</legend>
+        <div className="chip-row" role="radiogroup" aria-label="품목">
           {CATEGORIES.map((cat) => (
             <button
               key={cat}
@@ -154,7 +204,7 @@ export function QuoteForm({ value, onChange }: Props) {
       </div>
 
       <label className="field">
-        <span>수량</span>
+        <span>수량 (창 수)</span>
         <input
           type="text"
           inputMode="numeric"
@@ -168,24 +218,34 @@ export function QuoteForm({ value, onChange }: Props) {
         />
       </label>
 
-      <fieldset className="field-group">
-        <legend>불투명도</legend>
-        <div className="chip-row">
-          {(Object.keys(OPACITY_LABELS) as Opacity[]).map((o) => (
-            <button
-              key={o}
-              type="button"
-              className={`chip ${value.opacity === o ? 'selected' : ''}`}
-              onClick={() => set('opacity', o)}
-            >
-              {OPACITY_LABELS[o]}
-            </button>
-          ))}
-        </div>
-      </fieldset>
+      <label className="check-row">
+        <input
+          type="checkbox"
+          checked={value.layered}
+          onChange={(e) => set('layered', e.target.checked)}
+        />
+        <span>
+          레이어드 (쉬어+암막)
+          {layeredIncluded
+            ? ' · 패키지 기본 포함'
+            : ` · 가산 ${settings.layeredFeeRoom.toLocaleString('ko-KR')}원`}
+        </span>
+      </label>
+
+      <label className="check-row">
+        <input
+          type="checkbox"
+          checked={value.motorized}
+          onChange={(e) => set('motorized', e.target.checked)}
+        />
+        <span>
+          전동 · 스마트허브 (+
+          {settings.motorFeePerUnit.toLocaleString('ko-KR')}원/식)
+        </span>
+      </label>
 
       <fieldset className="field-group">
-        <legend>설치</legend>
+        <legend>설치비</legend>
         <div className="chip-row">
           {(['included', 'excluded'] as const).map((opt) => (
             <button
@@ -195,39 +255,13 @@ export function QuoteForm({ value, onChange }: Props) {
               onClick={() => set('install', opt)}
             >
               {INSTALL_LABELS[opt]}
+              {opt === 'included' && settings.installFeePerUnit > 0
+                ? ` (${settings.installFeePerUnit.toLocaleString('ko-KR')}원)`
+                : ''}
             </button>
           ))}
         </div>
       </fieldset>
-
-      {showFullness && (
-        <fieldset className="field-group">
-          <legend>주름배수 (커튼)</legend>
-          <div className="chip-row">
-            {([1.5, 2] as Fullness[]).map((f) => (
-              <button
-                key={f}
-                type="button"
-                className={`chip ${value.fullness === f ? 'selected' : ''}`}
-                onClick={() => set('fullness', f)}
-              >
-                {FULLNESS_LABELS[String(f)]}
-              </button>
-            ))}
-          </div>
-        </fieldset>
-      )}
-
-      {showMotor && (
-        <label className="check-row">
-          <input
-            type="checkbox"
-            checked={value.motorized}
-            onChange={(e) => set('motorized', e.target.checked)}
-          />
-          <span>전동화 포함</span>
-        </label>
-      )}
 
       <fieldset className="field-group">
         <legend>부가세</legend>
@@ -266,7 +300,7 @@ export function QuoteForm({ value, onChange }: Props) {
         <textarea
           value={value.memo}
           onChange={(e) => set('memo', e.target.value)}
-          placeholder="배송지, 원단 색상 등"
+          placeholder="현장·원단·시공 일정 등"
           rows={3}
         />
       </label>

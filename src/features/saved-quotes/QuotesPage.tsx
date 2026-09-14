@@ -1,6 +1,10 @@
 import { Link } from 'react-router-dom';
 import type { SavedQuote } from '../pricing/types';
-import { CATEGORY_LABELS } from '../pricing/types';
+import {
+  CATEGORY_LABELS,
+  LINE_LABELS,
+  PACKAGE_LABELS,
+} from '../pricing/types';
 import { formatKRW, formatNumber } from '../pricing/pricing';
 
 interface Props {
@@ -36,9 +40,12 @@ export function QuotesPage({ quotes, onDelete, onEdit }: Props) {
             <div className="quote-item-main">
               <div className="quote-item-title">{q.label}</div>
               <div className="quote-item-meta">
+                {PACKAGE_LABELS[q.input.packageId]} ·{' '}
+                {LINE_LABELS[q.input.lineId]} ·{' '}
                 {CATEGORY_LABELS[q.input.category]} ·{' '}
-                {formatNumber(q.input.width, 1)}×{formatNumber(q.input.height, 1)}
-                {q.input.unit} · {q.input.quantity}개
+                {formatNumber(q.input.width, 1)}×
+                {formatNumber(q.input.height, 1)}
+                {q.input.unit} · {q.input.quantity}식
               </div>
               <div className="quote-item-date">
                 {new Date(q.updatedAt).toLocaleString('ko-KR')}

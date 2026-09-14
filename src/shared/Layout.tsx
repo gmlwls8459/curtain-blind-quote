@@ -11,7 +11,7 @@ export function Layout() {
             </span>
             <div>
               <h1 className="brand-title">커튼 블라인더 견적</h1>
-              <p className="brand-sub">실시간 견적 · 샘플 단가</p>
+              <p className="brand-sub">D&apos;MOTIVE WINDOW · 기획 가정 단가</p>
             </div>
           </div>
           <nav className="nav" aria-label="주요 메뉴">
@@ -28,7 +28,10 @@ export function Layout() {
         <Outlet />
       </main>
       <footer className="app-footer no-print">
-        <p>단가는 「샘플 단가」이며 실제 시세와 다를 수 있습니다. · 데이터는 이 기기에만 저장됩니다.</p>
+        <p>
+          단가는 「기획 가정 단가」이며 실제 시세·원단·시공 조건과 다를 수 있습니다. · 데이터는 이
+          기기에만 저장됩니다.
+        </p>
       </footer>
     </div>
   );
